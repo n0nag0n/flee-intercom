@@ -6,6 +6,7 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 SET NAMES utf8mb4;
 
 CREATE DATABASE `intercom_data` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+use intercom_data;
 
 DROP TABLE IF EXISTS `admins`;
 CREATE TABLE `admins` (

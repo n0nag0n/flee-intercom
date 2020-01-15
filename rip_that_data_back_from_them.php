@@ -116,8 +116,10 @@ while (!empty($resp->scroll_param) && count($resp->contacts) > 0) {
 
 $conv_resp = $client->conversations->getConversations([]);
 
+$count = 1;
 while(count($conv_resp->conversations) > 0) {
-
+	echo "CONVERSATIONS PAGE $count: " . count($conv_resp->conversations) . "\n";
+	++$count;
 	foreach($conv_resp->conversations as $conversation) {
 
 		// start with the conversation parent element
@@ -126,6 +128,8 @@ while(count($conv_resp->conversations) > 0) {
 			echo "Duplicate conversation {$conversation->id} - SKIPPING\n";
 			continue;
 		}
+
+		$customer_reply_url = $conversation->customer_first_reply->url ?? '';
 
 		$db->execute("INSERT INTO conversations SET
 			intercom_id = ?,
@@ -138,20 +142,22 @@ while(count($conv_resp->conversations) > 0) {
 			$conversation->id,
 			date('Y-m-d H:i:s', $conversation->created_at),
 			($conversation->updated_at ? date('Y-m-d H:i:s', $conversation->updated_at) : null),
-			$conversation->customer_first_reply->url,
+			$customer_reply_url,
 			$conversation->assignee->type,
 			$conversation->assignee->id
 		]);
 
 		$conversation_id = $db->lastInsertId();
+		echo "	CONVERSATION ID: {$conversation_id}\n";
 
 		// pull out the tags
 		if(count($conversation->tags->tags)) {
+			echo "	CONVERSATION TAGS: " . count($conversation->tags->tags) . "\n";
 			foreach($conversation->tags->tags as $tag) {
 
 				$tag_check = $db->fetchField("SELECT COUNT(*) FROM conversation_tags WHERE conversation_id = ? AND tag_intercom_id = ?", [ $conversation_id, $tag->id ]);
 				if(!empty($tag_check)) {
-					echo "Duplicate conversation tag {$tag->id} - SKIPPING\n";
+					echo "	Duplicate conversation tag {$tag->id} - SKIPPING\n";
 					continue;
 				}
 				
@@ -175,11 +181,12 @@ while(count($conv_resp->conversations) > 0) {
 
 		// get all assigned people to the conversation
 		if(count($conversation->customers)) {
+			echo "	CONVERSATION CUSTOMERS: " . count($conversation->customers) . "\n";
 			foreach($conversation->customers as $customer) {
 
 				$customer_check = $db->fetchField("SELECT COUNT(*) FROM conversation_customers WHERE conversation_id = ? AND customer_id = ?", [ $conversation_id, $customer->id ]);
 				if(!empty($customer_check)) {
-					echo "Duplicate conversation customer {$customer->id} - SKIPPING\n";
+					echo "	Duplicate conversation customer {$customer->id} - SKIPPING\n";
 					continue;
 				}
 
@@ -197,13 +204,14 @@ while(count($conv_resp->conversations) > 0) {
 
 		// rip through any attachments attached to the main part of the conversation
 		if(count($conversation->conversation_message->attachments)) {
+			echo "	CONVERSATION ATTACHMENTS: " . count($conversation->conversation_message->attachments) . "\n";
 			foreach($conversation->conversation_message->attachments as $attachment) {
 
 				// use this as we aren't given a unique file id identifier...
 				$unique_filename_hash = hash('sha256', $attachment->name);
 				$attachment_check = $db->fetchField("SELECT COUNT(*) FROM conversation_attachments WHERE conversation_id = ? AND unique_filename_hash = ?", [ $conversation_id, $unique_filename_hash ]);
 				if(!empty($attachment_check)) {
-					echo "Duplicate conversation attachment {$attachment->name} - SKIPPING\n";
+					echo "	Duplicate conversation attachment {$attachment->name} - SKIPPING\n";
 					continue;
 				}
 
@@ -240,12 +248,13 @@ while(count($conv_resp->conversations) > 0) {
 		// now we rip through all the conversation parts.
 
 		$part_resp = $client->conversations->getConversation($conversation->id);
+		echo "	CONVERSATION PARTS: " . count($part_resp->conversation_parts->conversation_parts) . "\n";
 		if(isset($part_resp->conversation_parts->conversation_parts) && count($part_resp->conversation_parts->conversation_parts)) {
 			foreach($part_resp->conversation_parts->conversation_parts as $part) {
-
+				
 				$part_check = $db->fetchField("SELECT COUNT(*) FROM conversation_parts WHERE conversation_id = ? AND intercom_id = ?", [ $conversation_id, $part->id ]);
 				if(!empty($part_check)) {
-					echo "Duplicate conversation part {$part->id} - SKIPPING\n";
+					echo "	Duplicate conversation part {$part->id} - SKIPPING\n";
 					continue;
 				}
 
@@ -278,7 +287,50 @@ while(count($conv_resp->conversations) > 0) {
 				]);
 
 				$conversation_part_id = $db->lastInsertId();
+				echo "	CONVERSATION PART ID: {$conversation_part_id}\n";
 
+				// rip through any attachments attached to the main part of the conversation
+				if(count($part->attachments)) {
+					echo "		CONVERSATION PART ATTACHMENTS: " . count($part->attachments) . "\n";
+					foreach($part->attachments as $attachment) {
+
+						// use this as we aren't given a unique file id identifier...
+						$unique_filename_hash = hash('sha256', $attachment->name);
+						$attachment_check = $db->fetchField("SELECT COUNT(*) FROM conversation_part_attachments WHERE conversation_part_id = ? AND unique_filename_hash = ?", [ $conversation_part_id, $unique_filename_hash ]);
+						if(!empty($attachment_check)) {
+							echo "		Duplicate conversation attachment {$attachment->name} - SKIPPING\n";
+							continue;
+						}
+
+						$db->execute("INSERT INTO conversation_attachments SET
+							conversation_part_id = ?,
+							unique_filename_hash = ?,
+							attached_by_type = ?,
+							attached_by_id = ?,
+							type = ?,
+							name = ?,
+							url = ?,
+							content = ?,
+							content_type = ?,
+							filesize = ?,
+							width = ?,
+							height = ?
+						", [
+							$conversation_part_id,
+							$unique_filename_hash,
+							$conversation->conversation_message->author->type,
+							$conversation->conversation_message->author->id,
+							$attachment->type,
+							utf8_encode($attachment->name),
+							$attachment->url,
+							file_get_contents($attachment->url),
+							$attachment->content_type,
+							$attachment->filesize,
+							$attachment->width,
+							$attachment->height,
+						]);
+					}
+				}
 
 			}
 		}

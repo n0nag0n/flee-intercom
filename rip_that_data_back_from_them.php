@@ -22,97 +22,97 @@ $db = new Database('mysql:host='.$config['db_connection']['host'].';port='.$conf
 // Get your client all nicely setup
 $client = new IntercomClient($config['intercom_access_token']);
 
-// $resp = $client->users->scrollUsers([]);
+$resp = $client->users->scrollUsers([]);
 
-// $count = 1;
-// while (!empty($resp->scroll_param) && count($resp->users) > 0) {
-// 	echo "USERS PAGE $count: " . count($resp->users) . "\n";
-// 	$count = ++$count;
+$count = 1;
+while (!empty($resp->scroll_param) && count($resp->users) > 0) {
+	echo "USERS PAGE $count: " . count($resp->users) . "\n";
+	$count = ++$count;
 
-// 	foreach($resp->users as $user) {
-// 		$user_check = $db->fetchField("SELECT COUNT(*) FROM users WHERE intercom_id = ?", [ $user->id ]);
-// 		if(!empty($user_check)) {
-// 			echo "Duplicate user {$user->email} - SKIPPING\n";
-// 			continue;
-// 		}
+	foreach($resp->users as $user) {
+		$user_check = $db->fetchField("SELECT COUNT(*) FROM users WHERE intercom_id = ?", [ $user->id ]);
+		if(!empty($user_check)) {
+			echo "Duplicate user {$user->email} - SKIPPING\n";
+			continue;
+		}
 
-// 		$db->execute("INSERT INTO users SET
-// 			intercom_id = ?,
-// 			email = ?,
-// 			phone = ?,
-// 			name = ?,
-// 			pseudonym = ?,
-// 			app_id = ?,
-// 			referrer = ?
-// 		", [
-// 			$user->id,
-// 			$user->email,
-// 			$user->phone,
-// 			$user->name,
-// 			$user->pseudonym,
-// 			$user->app_id,
-// 			$user->referrer
-// 		]);
-// 	}
+		$db->execute("INSERT INTO users SET
+			intercom_id = ?,
+			email = ?,
+			phone = ?,
+			name = ?,
+			pseudonym = ?,
+			app_id = ?,
+			referrer = ?
+		", [
+			$user->id,
+			$user->email,
+			$user->phone,
+			$user->name,
+			$user->pseudonym,
+			$user->app_id,
+			$user->referrer
+		]);
+	}
 
-// 	$resp = $client->users->scrollUsers(["scroll_param" => $resp->scroll_param]);
-// }
+	$resp = $client->users->scrollUsers(["scroll_param" => $resp->scroll_param]);
+}
 
-// $resp = $client->admins->getAdmins([]);
+$resp = $client->admins->getAdmins([]);
 
-// foreach($resp->admins as $admin) {
-// 	$user_check = $db->fetchField("SELECT COUNT(*) FROM admins WHERE intercom_id = ?", [ $admin->id ]);
-// 	if(!empty($user_check)) {
-// 		echo "Duplicate admin {$admin->email} - SKIPPING\n";
-// 		continue;
-// 	}
+foreach($resp->admins as $admin) {
+	$user_check = $db->fetchField("SELECT COUNT(*) FROM admins WHERE intercom_id = ?", [ $admin->id ]);
+	if(!empty($user_check)) {
+		echo "Duplicate admin {$admin->email} - SKIPPING\n";
+		continue;
+	}
 
-// 	$db->execute("INSERT INTO admins SET
-// 		intercom_id = ?,
-// 		email = ?,
-// 		name = ?,
-// 		team_id = ?
-// 	", [
-// 		$admin->id,
-// 		$admin->email,
-// 		$admin->name,
-// 		join(',', $admin->team_ids)
-// 	]);
-// }
+	$db->execute("INSERT INTO admins SET
+		intercom_id = ?,
+		email = ?,
+		name = ?,
+		team_id = ?
+	", [
+		$admin->id,
+		$admin->email,
+		$admin->name,
+		join(',', $admin->team_ids)
+	]);
+}
 
-// $resp = $client->leads->scrollLeads([]);
+$resp = $client->leads->scrollLeads([]);
 
-// $count = 1;
-// while (!empty($resp->scroll_param) && count($resp->contacts) > 0) {
-// 	echo "LEADS PAGE $count: " . count($resp->contacts) . "\n";
-// 	$count = ++$count;
+$count = 1;
+while (!empty($resp->scroll_param) && count($resp->contacts) > 0) {
+	echo "LEADS PAGE $count: " . count($resp->contacts) . "\n";
+	$count = ++$count;
 
-// 	foreach($resp->contacts as $user) {
-// 		$user_check = $db->fetchField("SELECT COUNT(*) FROM leads WHERE intercom_id = ? AND intercom_user_id = ?", [ $user->id, $user->user_id ]);
-// 		if(!empty($user_check)) {
-// 			echo "Duplicate user {$user->email} - SKIPPING\n";
-// 			continue;
-// 		}
+	foreach($resp->contacts as $user) {
+		$user_check = $db->fetchField("SELECT COUNT(*) FROM leads WHERE intercom_id = ? AND intercom_user_id = ?", [ $user->id, $user->user_id ]);
+		if(!empty($user_check)) {
+			echo "Duplicate user {$user->email} - SKIPPING\n";
+			continue;
+		}
 
-// 		$db->execute("INSERT INTO leads SET
-// 			intercom_id = ?,
-// 			intercom_user_id = ?,
-// 			email = ?,
-// 			phone = ?,
-// 			name = ?,
-// 			pseudonym = ?
-// 		", [
-// 			$user->id,
-// 			$user->user_id,
-// 			utf8_encode($user->email),
-// 			$user->phone,
-// 			utf8_encode($user->name),
-// 			$user->pseudonym
-// 		]);
-// 	}
+		$db->execute("INSERT INTO leads SET
+			intercom_id = ?,
+			intercom_user_id = ?,
+			email = ?,
+			phone = ?,
+			name = ?,
+			pseudonym = ?
+		", [
+			$user->id,
+			$user->user_id,
+			utf8_encode($user->email),
+			$user->phone,
+			utf8_encode($user->name),
+			$user->pseudonym
+		]);
+	}
 
-// 	$resp = $client->leads->scrollLeads(["scroll_param" => $resp->scroll_param]);
-// }
+	$resp = $client->leads->scrollLeads(["scroll_param" => $resp->scroll_param]);
+}
 
 $conv_resp = $client->conversations->getConversations([]);
 

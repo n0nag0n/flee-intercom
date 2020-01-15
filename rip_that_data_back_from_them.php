@@ -302,7 +302,7 @@ while(count($conv_resp->conversations) > 0) {
 							continue;
 						}
 
-						$db->execute("INSERT INTO conversation_attachments SET
+						$db->execute("INSERT INTO conversation_part_attachments SET
 							conversation_part_id = ?,
 							unique_filename_hash = ?,
 							attached_by_type = ?,

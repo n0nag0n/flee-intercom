@@ -336,9 +336,6 @@ while(count($conv_resp->conversations) > 0) {
 		}
 	}
 
-
-
-
 	if(isset($conv_resp->pages->next) && $conv_resp->pages->next) {
 		$conv_resp = $client->nextPage($conv_resp->pages);
 	} else {

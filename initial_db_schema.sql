@@ -30,7 +30,7 @@ CREATE TABLE `conversations` (
   `updated_at` datetime DEFAULT NULL,
   `initiated_from_url` text DEFAULT NULL,
   `assigned_to_type` varchar(50) DEFAULT NULL,
-  `assigned_to_id` int(11) NOT NULL,
+  `assigned_to_id` int(11) NULL,
   PRIMARY KEY (`id`),
   KEY `conversation_id` (`intercom_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
@@ -111,7 +111,7 @@ CREATE TABLE `conversation_tags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `conversation_id` int(11) NOT NULL,
   `tag_intercom_id` int(11) NOT NULL,
-  `name` varchar(100) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   `applied_at` datetime DEFAULT NULL,
   `applied_by_type` varchar(50) NOT NULL,
   `applied_by_id` varchar(100) NOT NULL,

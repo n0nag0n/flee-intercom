@@ -339,7 +339,15 @@ while(count($conv_resp->conversations) > 0) {
 
 
 
-
-	$conv_resp = $client->nextPage($conv_resp->pages);
-
+	if(isset($conv_resp->pages->next) && $conv_resp->pages->next) {
+		$conv_resp = $client->nextPage($conv_resp->pages);
+	} else {
+		$conv_resp->conversations = [];
+	}
 }
+
+echo "CONVERSATIONS COMPLETED\n";
+
+
+
+echo "DATA RIPPED BACK, PROCESS COMPLETE. THANKS FOR USING IT!\n\n";

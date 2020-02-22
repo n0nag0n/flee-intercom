@@ -32,5 +32,7 @@ php rip_that_data_back_from_them.php
 
 and off it will go :)
 
+There is another script called `unsnooze_and_snooze.php` that will go through all the conversations you've pulled back and unsnooze them and then snooze them. This is used in some cases with integrations you may have with Intercom where you need conversations to unsnooze and snooze in order for a integration to trigger.
+
 This is currently based on Intercom v1.4 API
 

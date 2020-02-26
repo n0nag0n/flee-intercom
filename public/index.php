@@ -10,7 +10,7 @@ $f3 = \Base::instance();
 $f3->config = $config;
 $f3->TEMP = APP_ROOT_DIR.'tmp/';
 $f3->LOGS = APP_ROOT_DIR.'logs/';
-$f3->DEBUG = 3;
+$f3->DEBUG = 0;
 $f3->UI = APP_ROOT_DIR.'ui/';
 
 $f3->set('db', new DB\SQL('mysql:host='.$config['db_connection']['host'].';port='.$config['db_connection']['port'].';dbname='.$config['db_connection']['database'].';charset=UTF8', $config['db_connection']['username'], $config['db_connection']['password'], [

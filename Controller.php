@@ -7,7 +7,7 @@ class Controller {
 	public function beforeroute($f3) {
 
 		$token = $f3->REQUEST['api_token'] ?: str_replace('Bearer ', '', $f3->HEADERS['Authorization']);
-		if(!$token && stripos($f3->PATTERN, 'checkEmail') === false) {
+		if(!$token) {
 			$this->outputJson([ 'error' => 'invalid authorization' ], 403);
 		}
 

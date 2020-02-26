@@ -9,7 +9,7 @@ This will pull back all users, and all conversations attached to those users and
 
 Requirements
 ----
-- MySQL 5.5+
+- MySQL 5.6.1+
   - **Make sure to set your max_allowed_packet higher than the default of 16MB or your import mail fail. Go for 100MB for kicks.**
 - PHP 7+ with cURL and JSON extensions loaded (maybe some others)
 - Half a brain
@@ -34,5 +34,32 @@ and off it will go :)
 
 There is another script called `unsnooze_and_snooze.php` that will go through all the conversations you've pulled back and unsnooze them and then snooze them. This is used in some cases with integrations you may have with Intercom where you need conversations to unsnooze and snooze in order for a integration to trigger.
 
+API
+----
+Simple test usage is done by running `php -S localhost:8000 -t public/`. There are 4 routes defined in the `public/index.php` file.
+
+
+`GET|POST /api/getConversationHistoryByEmailAddress`
+
+You need to define the `email` param and it will return a JSON response of all your data.
+
+`GET|POST /getConversationHistoryByEmailAddress`
+
+You need to define the `email` param and it will return a HTML response of all your data with some minimal markup.
+
+`GET|POST /downloadFile`
+
+You need to define the `id` and `unique_filename_hash` param and it will download the file. If you add `&image=true` to the request, the url will be able to be used in a `<img src="<?=$url?>">` tag.
+
+`GET|POST /checkEmail`
+
+Has a simple form for you to check the data.
+
+There is a simple api that can be used. Just define an api_token in the `config.php` file. Then on any request, you can have a GET or POST param of `api_token` to authenticate with the api endpoints. You can also specify `Authorization: Bearer [api_token]` as a header.
+
+This is just to cover the bare minimum of security. There are much more hardened practices that could be used with this.
+
+Other Notes
+----
 This is currently based on Intercom v1.4 API
 

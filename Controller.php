@@ -140,7 +140,7 @@ class Controller {
 
 			foreach($conversation['parts'] as $key => $part) {
 				$conversation['parts'][$key]['author'] = $this->getUserDataFromUserIntercomId($part['author_type'], $part['author_id']);
-				$conversation['parts'][$key]['attachments'] = $db->exec("SELECT id, unique_filename_hash, type, name, url, TO_BASE64(content) content, content_type, filesize FROM conversation_part_attachments WHERE conversation_part_id = ?", [ $part['id'] ]);
+				$conversation['parts'][$key]['attachments'] = $db->exec("SELECT id, unique_filename_hash, type, name, url, TO_BASE64(content) content, content_type, attached_by_type, attached_by_id, filesize FROM conversation_part_attachments WHERE conversation_part_id = ?", [ $part['id'] ]);
 				foreach($conversation['parts'][$key]['attachments'] as $attachment_key => $attachment) {
 					$conversation['parts'][$key]['attachments'][$attachment_key]['attached_by'] = $this->getUserDataFromUserIntercomId($attachment['attached_by_type'], $attachment['attached_by_id']);
 					$conversation['parts'][$key]['attachments'][$attachment_key]['local_download_url'] = $f3->config['local_download_url_host'].'/downloadFile?id='.$attachment['id'].'&unique_filename_hash='.$attachment['unique_filename_hash'];

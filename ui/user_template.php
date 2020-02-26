@@ -36,7 +36,7 @@
 	<h2>Conversation History</h2>
 	<div style="padding-left: 40px;">
 		<?php foreach($user['conversation_history'] as $conversation) { ?>
-			<p><b>Conversation</b> - <i>Started <?=date('n/j/Y g:i a', strtotime($conversation['created_at'].' UTC'))?> UTC, Ended <?=date('n/j/Y g:i a', strtotime($conversation['updated_at'].' UTC'))?> UTC</i></p>
+			<p><b>Conversation</b> - <i>Started <?=date('n/j/Y g:i:s a', strtotime($conversation['created_at'].' UTC'))?> UTC, Ended <?=date('n/j/Y g:i:s a', strtotime($conversation['updated_at'].' UTC'))?> UTC</i></p>
 			<?php if(count($conversation['attachments'])) { ?>
 
 			<h3>Attachments</h3>
@@ -67,7 +67,7 @@
 				<p><b>Subject: </b> <?=$part['subject']?></p>
 				<?php } ?>
 				<div class="conversation-part conversation-part-<?=$part['author_type']?>">
-					<p><b><?=$part['author']['name']?></b> - <i><?=date('n/j/Y g:i a', strtotime($conversation['updated_at'].' UTC'))?> UTC</i></p>
+					<p><b><?=$part['author']['name']?></b> - <i><?=date('n/j/Y g:i:s a', strtotime($part['updated_at'].' UTC'))?> UTC</i></p>
 					<?=$this->raw($part['body'])?>
 				</div>
 				<?php } ?>
